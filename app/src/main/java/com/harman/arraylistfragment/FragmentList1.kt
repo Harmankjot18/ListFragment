@@ -1,13 +1,16 @@
 package com.harman.arraylistfragment
 
+import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import com.harman.arraylistfragment.databinding.AddItemBinding
 import com.harman.arraylistfragment.databinding.FragmentList1Binding
 import com.harman.arraylistfragment.databinding.FragmentList1Binding.*
+import com.harman.arraylistfragment.databinding.UpdateItemBinding
 import java.util.ArrayList
 
 // TODO: Rename parameter arguments, choose names that match
@@ -42,14 +45,51 @@ class FragmentList1 : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentList1Binding.inflate(layoutInflater)
-        var adapter =ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1,arrayList)
+        var adapter =ArrayAdapter(listFrag,android.R.layout.simple_list_item_1,arrayList)
         arrayList.add("hey")
         arrayList.add("hello 1")
         arrayList.add("pay 2")
         arrayList.add("put 3")
         binding.list.adapter = adapter
-        binding.list.setOnItemClickListener{ adapterView, view, i, l ->
-            System.out.println("i $i $1")
+        binding.btnFab.setOnClickListener {
+            var dialogBinding=AddItemBinding.inflate(layoutInflater)
+            var dialog = Dialog(listFrag)
+            dialog.setCancelable(false)
+            dialog.setContentView(dialogBinding.root)
+            val layout = dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dialogBinding.btnAdd.setOnClickListener {
+                if (dialogBinding.etAdd.text.toString().isNullOrEmpty()) {
+                    dialogBinding.etAdd.setError("Please Add Item")
+                } else {
+                    arrayList.add(dialogBinding.etAdd.text.toString())
+                    dialog.dismiss()
+                }
+            }
+            dialog.show()
+        }
+        binding.list.setOnItemClickListener { adapterView, view, i, l ->
+            var dialogBinding = UpdateItemBinding.inflate(layoutInflater)
+            var dialog = Dialog(listFrag)
+            dialog.setCancelable(false)
+            dialog.setContentView(dialogBinding.root)
+            val layout = dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dialogBinding.etUpdate.setText(arrayList[i])
+
+            dialogBinding.btnUpdate.setOnClickListener {
+                if (dialogBinding.etUpdate.text.toString().isNullOrEmpty()) {
+                    dialogBinding.etUpdate.setError("enter item")
+                } else {
+                    arrayList.set(i, dialogBinding.etUpdate.text.toString())
+                    dialog.dismiss()
+                }
+            }
+            dialog.show()
         }
         return binding.root
     }
